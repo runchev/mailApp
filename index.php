@@ -9,7 +9,7 @@
         <script src="js/tinymce/tinymce/js/tinymce/tinymce.min.js"></script>
         <script src="js/tinymce/tinymce/js/tinymce/jquery.tinymce.min.js"></script>
         <script>
-            tinymce.init({
+            tinymce.init({ // init tinymce text editor and adding plugins
                 selector:'textarea', 
                 plugins: [
                     'link'            
@@ -59,31 +59,31 @@
     </body>
 </html>
 <?php
-require 'phpmailer\PHPMailerAutoload.php';
-$email = isset($_POST["email"])? $_POST["email"]:"";
-$name = isset($_POST["name"])? $_POST["name"]:"";
-$password = isset($_POST["password"])? $_POST["password"]:"";
-$message = isset($_POST["message"])? $_POST["message"]:"";
-$subject = isset($_POST["subject"])? $_POST["subject"]:"";
-$mailService = isset($_POST["mailService"])? $_POST["mailService"]:"";
-$mysql = mysqli_connect('localhost', 'root', '');
-mysqli_select_db($mysql, 'mail_app');
-$result = mysqli_query($mysql, 'SELECT * FROM client');
+require_once 'phpmailer\PHPMailerAutoload.php'; // init php mailer 
+$email = isset($_POST["email"])? $_POST["email"]:""; //fetch sending email from form
+$name = isset($_POST["name"])? $_POST["name"]:"";   //fetch sending name from form
+$password = isset($_POST["password"])? $_POST["password"]:""; //fetch sending password from form
+$message = isset($_POST["message"])? $_POST["message"]:""; //fetch sending message from form
+$subject = isset($_POST["subject"])? $_POST["subject"]:"";  //fetch sending subbject from form
+$mailService = isset($_POST["mailService"])? $_POST["mailService"]:""; //fetch sending smtp type from form
+$mysql = mysqli_connect('localhost', 'root', ''); // create sql connection parametars: sql server, username, password
+mysqli_select_db($mysql, 'mail_app');   // select database
+$result = mysqli_query($mysql, 'SELECT * FROM client'); // fetching clients
 
 if($email!=""&&$password!=""&&$subject!=""&&$mailService!=""){
-    switch($mailService){
+    switch($mailService){ //selecting smtp client for sending email
         case "gmail":{
-            foreach ($result as $row) {
+            foreach ($result as $row) { //iterating in client's list and sending message using gmail smtp
                  send_mail($email,$password,$row['ClientEmail'],$message,$subject,$row['ClientName'],$name,"smtp.gmail.com");
             }      
         }break;
         case "yahoo":{
-            foreach ($result as $row) { 
+            foreach ($result as $row) { //iterating in client's list and sending message using yahoo smtp
                 send_mail($email,$password,$row['ClientEmail'],$message,$subject,$row['ClientName'],$name,"smtp.mail.yahoo.com");
         }
         }break;
         case "microsoft":{
-            foreach ($result as $row) { 
+            foreach ($result as $row) { //iterating in client's list and sending message using live smtp
                 send_mail($email,$password,$row['ClientEmail'],$message,$subject,$row['ClientName'],$name,"smtp.live.com");
             }
         }break;           
@@ -137,9 +137,9 @@ function send_mail($from,$password, $to, $message, $subject,$recipName,$sendName
         // $mail->addAttachment('images/phpmailer_mini.png');
         //send the message, check for errors
         $mail->send();
-        echo '<p class=\"text-primary\"> Message has been sent to '.$to." </p>";
+        echo '<p class=\"text-primary\"> Message has been sent to '.$to." </p>"; //result if message is sent.
     }catch(phpmailerException $e){
-        echo "<p class=\"text-danger\">Failed to send to " . $to . " " . $e->errorMessage(). "</p>";
+        echo "<p class=\"text-danger\">Failed to send to " . $to . " " . $e->errorMessage(). "</p>"; // result if message is not sent.
     }
 }
 ?>
